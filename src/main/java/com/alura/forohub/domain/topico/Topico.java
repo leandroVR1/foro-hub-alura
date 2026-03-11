@@ -27,15 +27,17 @@ public class Topico {
     private String curso;
 
 
+    private Boolean activo;
+
     public Topico(DatosRegistroTopico datos) {
+        this.activo = true; // Todo tópico nuevo nace activo
         this.titulo = datos.titulo();
         this.mensaje = datos.mensaje();
         this.autor = datos.autor();
         this.curso = datos.curso();
-        this.status = "NO_RESPONDIDO"; // Estado inicial por defecto
+        this.status = "NO_RESPONDIDO";
         this.fechaCreacion = LocalDateTime.now();
     }
-
 
     public void actualizarDatos(DatosActualizarTopico datos) {
         if (datos.titulo() != null) {
@@ -44,6 +46,10 @@ public class Topico {
         if (datos.mensaje() != null) {
             this.mensaje = datos.mensaje();
         }
+    }
 
+    // Método para cambiar el estado a inactivo
+    public void eliminarLogico() {
+        this.activo = false;
     }
 }

@@ -1,4 +1,5 @@
 package com.alura.forohub.controller;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import com.alura.forohub.domain.topico.*;
@@ -35,9 +36,13 @@ public class TopicoController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<DatosListadoTopico>> listarTopicos(
-            @PageableDefault(size = 10, sort = "fechaCreacion", direction = Sort.Direction.ASC) Pageable paginacion) {
-        return ResponseEntity.ok(repository.findAll(paginacion).map(DatosListadoTopico::new));
+    public ResponseEntity<Page<DatosListadoTopico>> listar(
+            @Parameter(hidden = true) // <--- Agrega esto
+            @PageableDefault(size = 10, sort = "fechaCreacion", direction = Sort.Direction.ASC)
+            Pageable paginacion) {
+
+        var pagina = repository.findAll(paginacion).map(DatosListadoTopico::new);
+        return ResponseEntity.ok(pagina);
     }
 
     @GetMapping("/{id}")
@@ -77,14 +82,9 @@ public class TopicoController {
     @DeleteMapping("/{id}")
     @Transactional
     public ResponseEntity eliminar(@PathVariable Long id) {
-        var optionalTopico = repository.findById(id);
-
-        if (optionalTopico.isPresent()) {
-            repository.deleteById(id);
-            return ResponseEntity.noContent().build(); // 204 No Content
-        }
-
-        return ResponseEntity.notFound().build(); // 404 si el ID no existe
+        var topico = repository.getReferenceById(id); // Buscamos la referencia
+        topico.eliminarLogico(); // Marcamos como activo = false
+        return ResponseEntity.noContent().build();
     }
 
 
